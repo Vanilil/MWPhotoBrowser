@@ -708,6 +708,15 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     }
 }
 
+- (void)setPhotoDeleted:(BOOL)selected atIndex:(NSUInteger)index {
+    if (_displayDeleteButtons) {
+        if ([self.delegate respondsToSelector:@selector(photoBrowser:deletePhotoAtIndex:)])
+        {
+            [self.delegate photoBrowser:self deletePhotoAtIndex:index];
+        }
+    }
+}
+
 - (UIImage *)imageForPhoto:(id<MWPhoto>)photo {
 	if (photo) {
 		// Get image or obtain in background
@@ -852,6 +861,18 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
                 [_pagingScrollView addSubview:selectedButton];
                 page.selectedButton = selectedButton;
                 selectedButton.selected = [self photoIsSelectedAtIndex:index];
+            }
+            
+            // Add delete button
+            if (self.displayDeleteButtons) {
+                UIButton *deleteButton = [UIButton buttonWithType:UIButtonTypeCustom];
+                [deleteButton setImage:[UIImage imageForResourcePath:@"MWPhotoBrowser.bundle/ImageDelete" ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]] forState:UIControlStateNormal];
+                [deleteButton sizeToFit];
+                deleteButton.adjustsImageWhenHighlighted = NO;
+                [deleteButton addTarget:self action:@selector(deleteButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+                deleteButton.frame = [self frameForSelectedButton:deleteButton atIndex:index];
+                [_pagingScrollView addSubview:deleteButton];
+                page.selectedButton = deleteButton;
             }
             
 		}
@@ -1162,6 +1183,21 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     }
     if (index != NSUIntegerMax) {
         [self setPhotoSelected:selectedButton.selected atIndex:index];
+    }
+}
+
+- (void)deleteButtonTapped:(id)sender {
+    UIButton *selectedButton = (UIButton *)sender;
+    selectedButton.selected = !selectedButton.selected;
+    NSUInteger index = NSUIntegerMax;
+    for (MWZoomingScrollView *page in _visiblePages) {
+        if (page.selectedButton == selectedButton) {
+            index = page.index;
+            break;
+        }
+    }
+    if (index != NSUIntegerMax) {
+        [self setPhotoDeleted:selectedButton.selected atIndex:index];
     }
 }
 
