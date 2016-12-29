@@ -1104,7 +1104,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     NSUInteger numberOfPhotos = [self numberOfPhotos];
     if (_gridController) {
         if (_gridController.selectionMode) {
-            self.title = NSLocalizedString(@"Select Photos", nil);
+            self.title = NSLocalizedString(@"Selection Photos", nil);
         } else {
             NSString *photosText;
             if (numberOfPhotos == 1) {
@@ -1118,7 +1118,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         if ([_delegate respondsToSelector:@selector(photoBrowser:titleForPhotoAtIndex:)]) {
             self.title = [_delegate photoBrowser:self titleForPhotoAtIndex:_currentPageIndex];
         } else {
-            self.title = [NSString stringWithFormat:@"%lu %@ %lu", (unsigned long)(_currentPageIndex+1), NSLocalizedString(@"of", @"Used in the context: 'Showing 1 of 3 items'"), (unsigned long)numberOfPhotos];
+            self.title = [NSString stringWithFormat:@"%lu %@ %lu", (unsigned long)(_currentPageIndex+1), NSLocalizedString(@"sur", @"Used in the context: 'Montrer 1 sur 3 photos'"), (unsigned long)numberOfPhotos];
         }
     } else {
         self.title = nil;
