@@ -19,22 +19,22 @@
     NSUInteger _photoCount;
     NSMutableArray *_photos;
     NSMutableArray *_thumbPhotos;
-	NSArray *_fixedPhotosArray; // Provided via init
-	
-	// Views
-	UIScrollView *_pagingScrollView;
-	
-	// Paging & layout
-	NSMutableSet *_visiblePages, *_recycledPages;
-	NSUInteger _currentPageIndex;
+    NSArray *_fixedPhotosArray; // Provided via init
+    
+    // Views
+    UIScrollView *_pagingScrollView;
+    
+    // Paging & layout
+    NSMutableSet *_visiblePages, *_recycledPages;
+    NSUInteger _currentPageIndex;
     NSUInteger _previousPageIndex;
     CGRect _previousLayoutBounds;
-	NSUInteger _pageIndexBeforeRotation;
-	
-	// Navigation & controls
-	UIToolbar *_toolbar;
-	NSTimer *_controlVisibilityTimer;
-	UIBarButtonItem *_previousButton, *_nextButton, *_actionButton, *_doneButton;
+    NSUInteger _pageIndexBeforeRotation;
+    
+    // Navigation & controls
+    UIToolbar *_toolbar;
+    NSTimer *_controlVisibilityTimer;
+    UIBarButtonItem *_previousButton, *_nextButton, *_actionButton, *_doneButton, *_deleteButton;
     MBProgressHUD *_progressHUD;
     
     // Grid

@@ -193,6 +193,11 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         _actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(actionButtonPressed:)];
     }
     
+    // Add delete button
+    if (self.displayDeleteButtons) {
+        _deleteButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteButtonTapped:)];
+    }
+    
     // Update
     [self reloadData];
     
@@ -263,7 +268,9 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     }
     
     // Middle - Nav
-    if (_previousButton && _nextButton && numberOfPhotos > 1) {
+    if (_previousButton && _nextButton) {
+        _previousButton.tintColor = UIColor.whiteColor;
+        _nextButton.tintColor = UIColor.whiteColor;
         hasItems = YES;
         [items addObject:flexSpace];
         [items addObject:_previousButton];
@@ -274,8 +281,20 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         [items addObject:flexSpace];
     }
     
+    // Right - Delete
+    if (_deleteButton && !(!self.navigationItem.rightBarButtonItem)) {
+        _deleteButton.tintColor = UIColor.whiteColor;
+        [items addObject:_deleteButton];
+    } else {
+        // We're not showing the toolbar so try and show in top right
+        if (_deleteButton)
+            self.navigationItem.rightBarButtonItem = _deleteButton;
+        [items addObject:fixedSpace];
+    }
+    
     // Right - Action
     if (_actionButton && !(!hasItems && !self.navigationItem.rightBarButtonItem)) {
+        _actionButton.tintColor = UIColor.whiteColor;
         [items addObject:_actionButton];
     } else {
         // We're not showing the toolbar so try and show in top right
@@ -709,7 +728,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     }
 }
 
-- (void)setPhotoDeleted:(BOOL)selected atIndex:(NSUInteger)index {
+- (void)setPhotoDeletedAtIndex:(NSUInteger)index {
     if (_displayDeleteButtons) {
         if ([self.delegate respondsToSelector:@selector(photoBrowser:deletePhotoAtIndex:)])
         {
@@ -862,18 +881,6 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
                 [_pagingScrollView addSubview:selectedButton];
                 page.selectedButton = selectedButton;
                 selectedButton.selected = [self photoIsSelectedAtIndex:index];
-            }
-            
-            // Add delete button
-            if (self.displayDeleteButtons) {
-                UIButton *deleteButton = [UIButton buttonWithType:UIButtonTypeCustom];
-                [deleteButton setImage:[UIImage imageForResourcePath:@"MWPhotoBrowser.bundle/ImageDelete" ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]] forState:UIControlStateNormal];
-                [deleteButton sizeToFit];
-                deleteButton.adjustsImageWhenHighlighted = NO;
-                [deleteButton addTarget:self action:@selector(deleteButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-                deleteButton.frame = [self frameForSelectedButton:deleteButton atIndex:index];
-                [_pagingScrollView addSubview:deleteButton];
-                page.selectedButton = deleteButton;
             }
             
         }
@@ -1137,10 +1144,8 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     MWPhoto *photo = [self photoAtIndex:_currentPageIndex];
     if ([photo underlyingImage] == nil || ([photo respondsToSelector:@selector(isVideo)] && photo.isVideo)) {
         _actionButton.enabled = NO;
-        _actionButton.tintColor = [UIColor clearColor]; // Tint to hide button
     } else {
         _actionButton.enabled = YES;
-        _actionButton.tintColor = nil;
     }
     
 }
@@ -1192,17 +1197,11 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 }
 
 - (void)deleteButtonTapped:(id)sender {
-    UIButton *selectedButton = (UIButton *)sender;
-    selectedButton.selected = !selectedButton.selected;
+    
     NSUInteger index = NSUIntegerMax;
-    for (MWZoomingScrollView *page in _visiblePages) {
-        if (page.selectedButton == selectedButton) {
-            index = page.index;
-            break;
-        }
-    }
+    index = _currentPageIndex;
     if (index != NSUIntegerMax) {
-        [self setPhotoDeleted:selectedButton.selected atIndex:index];
+        [self setPhotoDeletedAtIndex:index];
     }
 }
 
